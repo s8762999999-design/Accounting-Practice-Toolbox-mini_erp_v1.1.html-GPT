@@ -2,72 +2,431 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>會計內控系統 v1.1（Mini ERP）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>會計內控系統 v1.1 · 行動優化</title>
 
 <style>
-    /* 全局與佈局設定 */
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; background:#eef1f5; color:#333; }
-    header { background:#1f2d3d; color:white; padding:15px 20px; text-align:left; font-size:22px; font-weight:bold; display: flex; justify-content: space-between; align-items: center;}
-    header span.version { font-size: 14px; background: #1ab394; padding: 3px 8px; border-radius: 4px; }
-    .container { display:flex; height: calc(100vh - 60px); }
-    
-    /* 側邊欄 */
-    .sidebar { width:220px; background:#2f4050; color:white; padding:20px 10px; }
-    .sidebar button { width:100%; padding:12px; margin:5px 0; background:transparent; border:1px solid transparent; color:#a7b1c2; text-align:left; font-size:15px; cursor:pointer; border-radius: 4px; transition: all 0.3s;}
-    .sidebar button:hover, .sidebar button.active { background:#293846; color:white; border-left: 4px solid #1ab394; }
+    /* 全局與佈局設定 —— 行動優先響應式 */
+    * { box-sizing: border-box; }
+    body { 
+        font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif; 
+        margin:0; 
+        background:#eef1f5; 
+        color:#1e2b3a; 
+        line-height: 1.4;
+    }
+    header { 
+        background:#1f2d3d; 
+        color:white; 
+        padding:12px 16px; 
+        display: flex; 
+        flex-wrap: wrap;
+        justify-content: space-between; 
+        align-items: center;
+        row-gap: 8px;
+    }
+    header .title-block {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    header .title-block h1 {
+        font-size: 20px;
+        margin: 0;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    header span.version { 
+        font-size: 13px; 
+        background: #1ab394; 
+        padding: 3px 8px; 
+        border-radius: 20px; 
+        font-weight: 500;
+    }
+    .role-selector {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #2c3e50;
+        padding: 4px 10px;
+        border-radius: 30px;
+    }
+    .role-selector label {
+        font-size: 14px;
+        color: #ccd7e4;
+    }
+    #currentUserRole {
+        padding: 6px 10px;
+        border-radius: 30px;
+        border: none;
+        background: white;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1f2d3d;
+    }
 
-    /* 主內容區 */
-    .content { flex:1; padding:20px; overflow-y: auto; }
-    .card { background:white; padding:20px; margin-bottom:20px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-    .card h3 { margin-top: 0; color: #1f2d3d; border-bottom: 2px solid #eef1f5; padding-bottom: 10px; }
+    /* 主容器 —— 移動端改為垂直流向 */
+    .container { 
+        display: flex; 
+        flex-direction: row;
+        min-height: calc(100vh - 110px); 
+    }
+    
+    /* 側邊欄 —— 桌面固定寬，行動端全寬+水平捲動/網格 */
+    .sidebar { 
+        width: 220px; 
+        background:#2f4050; 
+        color:white; 
+        padding: 16px 8px; 
+        transition: all 0.2s;
+    }
+    .sidebar button { 
+        width:100%; 
+        padding:12px 10px; 
+        margin:4px 0; 
+        background:transparent; 
+        border:1px solid transparent; 
+        color:#b8c7d9; 
+        text-align:left; 
+        font-size:15px; 
+        font-weight: 500;
+        cursor:pointer; 
+        border-radius: 30px; 
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .sidebar button:hover, .sidebar button.active { 
+        background:#1f2d3d; 
+        color:white; 
+        border-left: 4px solid #1ab394; 
+        padding-left: 12px;
+    }
+
+    /* 主要內容區域 */
+    .content { 
+        flex:1; 
+        padding:16px 12px; 
+        overflow-y: auto; 
+        background: #f4f7fb;
+    }
+    .card { 
+        background:white; 
+        padding:18px 16px; 
+        margin-bottom:20px; 
+        border-radius:20px; 
+        box-shadow:0 4px 12px rgba(0,0,0,0.04); 
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+    .card h3 { 
+        margin-top: 0; 
+        margin-bottom: 18px;
+        color: #1f2d3d; 
+        font-weight: 600;
+        border-bottom: 2px solid #e9ecf2; 
+        padding-bottom: 12px; 
+        font-size: 1.3rem;
+    }
 
     /* 表單與輸入控制項 */
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #666; font-size: 14px; }
-    input, select { padding:10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-    input:focus, select:focus { outline: none; border-color: #1ab394; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { 
+        display: block; 
+        margin-bottom: 6px; 
+        font-weight: 600; 
+        color: #3e4e5e; 
+        font-size: 14px; 
+    }
+    input, select { 
+        padding:12px 14px; 
+        border: 1.5px solid #d0dae6; 
+        border-radius: 16px; 
+        font-size: 16px;  /* 防止手機自動縮放 */
+        background: white;
+        width: 100%;
+        box-sizing: border-box;
+        transition: border 0.15s;
+    }
+    input:focus, select:focus { 
+        outline: none; 
+        border-color: #1ab394; 
+        box-shadow: 0 0 0 3px rgba(26,179,148,0.1);
+    }
     
     /* 按鈕樣式 */
-    button.btn { padding:10px 15px; border:none; border-radius:4px; cursor:pointer; font-weight: bold; transition: background 0.3s; }
-    button.btn-primary { background:#1ab394; color:white; }
-    button.btn-primary:hover { background:#18a689; }
-    button.btn-primary:disabled { background:#ccc; cursor:not-allowed; }
-    button.btn-danger { background:#ed5565; color:white; padding: 6px 10px; }
-    button.btn-secondary { background:#f3f3f4; color:#333; border: 1px solid #ccc; }
+    button.btn { 
+        padding:12px 18px; 
+        border:none; 
+        border-radius:40px; 
+        cursor:pointer; 
+        font-weight: 600; 
+        font-size: 15px;
+        transition: all 0.2s; 
+        background: white;
+        border: 1px solid transparent;
+    }
+    button.btn-primary { 
+        background:#1ab394; 
+        color:white; 
+        box-shadow: 0 4px 8px rgba(26,179,148,0.2);
+    }
+    button.btn-primary:active { background:#0e8f75; transform: scale(0.98); }
+    button.btn-primary:disabled { 
+        background:#cbd5e0; 
+        box-shadow: none; 
+        color:#6b7a8a; 
+        cursor: not-allowed; 
+        opacity: 0.7;
+    }
+    button.btn-danger { 
+        background:#f1515e; 
+        color:white; 
+        padding: 8px 14px; 
+        border-radius: 30px;
+    }
+    button.btn-secondary { 
+        background:#f0f3f7; 
+        color:#1f2d3d; 
+        border: 1px solid #cfdbe8; 
+    }
 
-    /* 表格樣式 */
-    table { width:100%; border-collapse: collapse; margin-top:10px; font-size: 14px; }
+    /* 分錄明細專用區塊 */
+    .entry-rows { 
+        background: #fbfdff; 
+        border: 1px solid #e2e9f2; 
+        padding: 16px 12px; 
+        border-radius: 20px; 
+        margin-bottom: 16px; 
+    }
+    .entry-row { 
+        display: flex; 
+        gap: 10px; 
+        margin-bottom: 12px; 
+        align-items: center; 
+        flex-wrap: wrap;
+    }
+    .entry-row input { flex: 1; min-width: 120px; }
+    .summary-box { 
+        background: #f0f5fa; 
+        padding: 16px; 
+        border-radius: 20px; 
+        text-align: right; 
+        font-weight: 700; 
+        font-size: 17px; 
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+    }
+    .balance-warning { 
+        color: #d1453b; 
+        display: inline-block; 
+        margin-left: 8px; 
+        font-size: 14px; 
+        background: #fff0ee;
+        padding: 4px 12px;
+        border-radius: 40px;
+    }
+
+    /* 表格與行動捲動 */
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        margin-top: 8px;
+        border-radius: 16px;
+        border: 1px solid #e7eaec;
+    }
+    table { 
+        width:100%; 
+        border-collapse: collapse; 
+        font-size: 14px; 
+        min-width: 600px; 
+    }
     table, th, td { border:1px solid #e7eaec; }
-    th { padding:12px 8px; text-align:left; background-color: #f5f5f6; color: #333; }
-    td { padding:10px 8px; }
+    th { 
+        padding:14px 10px; 
+        text-align:left; 
+        background-color: #f4f7fc; 
+        color: #1e2b3a; 
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    td { padding:12px 10px; background: white; }
     .text-right { text-align: right; }
     .text-center { text-align: center; }
 
-    /* 分錄明細專用區塊 */
-    .entry-rows { background: #fdfdfd; border: 1px solid #eee; padding: 15px; border-radius: 4px; margin-bottom: 15px; }
-    .entry-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-    .entry-row input { flex: 1; }
-    .summary-box { background: #f8f9fa; padding: 15px; border-radius: 4px; text-align: right; font-weight: bold; font-size: 16px; margin-bottom: 15px;}
-    .balance-warning { color: #ed5565; display: none; margin-left: 15px; font-size: 14px; }
-
     /* 稽核日誌 */
-    .audit-list { list-style: none; padding: 0; }
-    .audit-list li { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
-    .audit-list li span.time { color: #888; margin-right: 15px; }
-    .audit-list li span.role { background: #1f2d3d; color: white; padding: 2px 6px; border-radius: 3px; margin-right: 10px; }
+    .audit-list { 
+        list-style: none; 
+        padding: 0; 
+        margin: 0;
+        max-height: 420px;
+        overflow-y: auto;
+    }
+    .audit-list li { 
+        padding: 14px 12px; 
+        border-bottom: 1px solid #eef2f6; 
+        font-size: 14px; 
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 6px;
+    }
+    .audit-list li span.time { 
+        color: #62748c; 
+        font-size: 12px; 
+        background: #f0f4fa;
+        padding: 3px 10px;
+        border-radius: 30px;
+        margin-right: 6px;
+    }
+    .audit-list li span.role { 
+        background: #1f2d3d; 
+        color: white; 
+        padding: 3px 12px; 
+        border-radius: 30px; 
+        font-size: 12px;
+        font-weight: 500;
+    }
 
-    .footer { text-align:center; padding:10px; font-size:12px; color:#999; background: #fff; border-top: 1px solid #eee;}
+    .footer { 
+        text-align:center; 
+        padding:16px 12px; 
+        font-size:13px; 
+        color:#6a7e94; 
+        background: #fff; 
+        border-top: 1px solid #dee6ed;
+    }
+
+    /* ----- 響應式設計 (Mobile First 精細調整) ----- */
+    @media screen and (max-width: 768px) {
+        .container {
+            flex-direction: column;
+            height: auto;
+        }
+        .sidebar {
+            width: 100%;
+            padding: 10px 8px;
+        }
+        /* 側邊欄按鈕改為網格，更適合觸控 */
+        .sidebar {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+        .sidebar button {
+            text-align: center;
+            padding: 12px 6px;
+            font-size: 14px;
+            white-space: normal;
+            border-radius: 40px;
+            margin: 0;
+        }
+        .sidebar button.active {
+            border-left: none;
+            border-bottom: 4px solid #1ab394;
+            background: #1f2d3d;
+        }
+        
+        header {
+            padding: 12px 12px;
+        }
+        .role-selector {
+            width: 100%;
+            justify-content: space-between;
+        }
+        #currentUserRole {
+            flex: 1;
+        }
+        
+        .content {
+            padding: 12px 10px;
+        }
+        .card {
+            padding: 16px 14px;
+        }
+        
+        /* 分錄輸入行列：手機上轉為垂直排列 */
+        .entry-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .entry-row input {
+            width: 100%;
+            min-width: unset;
+        }
+        .entry-row button {
+            align-self: flex-end;
+            width: 100%;
+            padding: 12px;
+        }
+        
+        /* 總和框 */
+        .summary-box {
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+            font-size: 16px;
+        }
+        
+        /* 按鈕加大 */
+        button.btn {
+            padding: 14px 18px;
+            font-size: 16px;
+        }
+        .btn-secondary {
+            width: 100%;
+        }
+        
+        /* 表格外容器確保可滑動 */
+        .table-wrapper {
+            border-radius: 18px;
+        }
+    }
+
+    /* 更小螢幕 (<480) 進一步優化 */
+    @media screen and (max-width: 480px) {
+        header .title-block h1 {
+            font-size: 18px;
+        }
+        .sidebar {
+            grid-template-columns: 1fr; /* 單列按鈕更易點擊 */
+        }
+        .sidebar button {
+            text-align: left;
+            padding-left: 20px;
+        }
+        .card h3 {
+            font-size: 1.2rem;
+        }
+        .entry-rows {
+            padding: 12px 8px;
+        }
+        input, select {
+            padding: 14px 12px;
+        }
+    }
+    
+    /* 觸控優化：移除hover sticky效果 */
+    @media (hover: hover) {
+        .sidebar button:hover { background:#293846; }
+    }
 </style>
 </head>
 
 <body>
 
 <header>
-    <div>會計內控系統（Mini ERP） <span class="version">v1.1</span></div>
-    <div style="font-size: 16px; font-weight: normal;">
-        當前角色：
-        <select id="currentUserRole" style="padding: 5px; font-size: 14px;">
+    <div class="title-block">
+        <h1>📊 會計內控系統</h1>
+        <span class="version">v1.1 · Mini ERP</span>
+    </div>
+    <div class="role-selector">
+        <label>👤 當前角色</label>
+        <select id="currentUserRole">
             <option value="採購專員">採購專員 (Maker)</option>
             <option value="初階會計">初階會計 (Maker)</option>
             <option value="總帳會計">總帳會計 (Checker)</option>
@@ -78,112 +437,116 @@
 
 <div class="container">
     <div class="sidebar">
-        <button class="nav-btn active" onclick="showSection('entry', this)">分錄輸入 (Voucher)</button>
-        <button class="nav-btn" onclick="showSection('ledger', this)">總帳查詢 (Ledger)</button>
-        <button class="nav-btn" onclick="showSection('closing', this)">月結控制 (Closing)</button>
-        <button class="nav-btn" onclick="showSection('audit', this)">稽核軌跡 (Audit Trail)</button>
+        <button class="nav-btn active" onclick="showSection('entry', this)">📝 分錄輸入</button>
+        <button class="nav-btn" onclick="showSection('ledger', this)">📚 總帳查詢</button>
+        <button class="nav-btn" onclick="showSection('closing', this)">🔒 月結控制</button>
+        <button class="nav-btn" onclick="showSection('audit', this)">📋 稽核軌跡</button>
     </div>
 
     <div class="content">
 
+        <!-- 分錄輸入區塊 -->
         <div id="entry" class="section">
             <div class="card">
-                <h3>新增交易分錄 (Double-entry)</h3>
+                <h3>➕ 新增交易分錄 (Double-entry)</h3>
                 <div class="form-group">
-                    <label>交易日期</label>
-                    <input type="date" id="txnDate">
+                    <label>📅 交易日期</label>
+                    <input type="date" id="txnDate" value="2026-04-13">
                 </div>
 
                 <div class="entry-rows" id="entryRowsContainer">
-                    </div>
-
-                <button class="btn btn-secondary" onclick="addEntryRow()">+ 新增借貸明細</button>
-
-                <div class="summary-box" style="margin-top: 15px;">
-                    借方總和 (Debit)：<span id="sumDebit">0</span> | 
-                    貸方總和 (Credit)：<span id="sumCredit">0</span>
-                    <span id="balanceWarning" class="balance-warning">⚠️ 借貸不平衡，無法儲存</span>
+                    <!-- 動態插入明細列 -->
                 </div>
 
-                <button id="saveBtn" class="btn btn-primary" style="width: 100%; font-size: 16px;" onclick="saveTransaction()" disabled>送出核准並儲存</button>
+                <button class="btn btn-secondary" onclick="addEntryRow()" style="margin-bottom: 12px;">➕ 新增借貸明細</button>
+
+                <div class="summary-box">
+                    <span>借方總和 (Debit)：<span id="sumDebit">0</span></span>
+                    <span>貸方總和 (Credit)：<span id="sumCredit">0</span></span>
+                    <span id="balanceWarning" class="balance-warning" style="display: none;">⚠️ 借貸不平衡</span>
+                </div>
+
+                <button id="saveBtn" class="btn btn-primary" style="width: 100%;" onclick="saveTransaction()" disabled>✔ 送出核准並儲存</button>
+                <p style="font-size: 12px; color:#7f8fa0; margin-top: 12px; text-align: center;">每一筆分錄均記錄於不可竄改日誌</p>
             </div>
         </div>
 
+        <!-- 總帳查詢 -->
         <div id="ledger" class="section" style="display:none;">
             <div class="card">
-                <h3>總帳歷史紀錄</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>交易編號 (UUID)</th>
-                            <th>日期</th>
-                            <th>科目名稱</th>
-                            <th class="text-right">借方 (Debit)</th>
-                            <th class="text-right">貸方 (Credit)</th>
-                            <th class="text-center">製單人</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ledgerTableBody"></tbody>
-                </table>
+                <h3>📖 總帳歷史紀錄</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>交易編號</th>
+                                <th>日期</th>
+                                <th>科目名稱</th>
+                                <th class="text-right">借方</th>
+                                <th class="text-right">貸方</th>
+                                <th class="text-center">製單人</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledgerTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
+        <!-- 月結控制 -->
         <div id="closing" class="section" style="display:none;">
             <div class="card">
-                <h3>期末月結與內控檢核 (Checklist)</h3>
-                <div class="form-group"><label><input type="checkbox"> 1. 收入與應收帳款認列確認 (Revenue Recognition)</label></div>
+                <h3>🗓️ 期末月結與內控檢核</h3>
+                <div class="form-group"><label><input type="checkbox"> 1. 收入與應收帳款認列確認</label></div>
                 <div class="form-group"><label><input type="checkbox"> 2. 存貨盤點與成本結轉 (COGS)</label></div>
-                <div class="form-group"><label><input type="checkbox"> 3. 費用入帳與預付攤銷 (Accruals & Prepaids)</label></div>
-                <div class="form-group"><label><input type="checkbox"> 4. 固定資產折舊提列 (Depreciation)</label></div>
-                <div class="form-group"><label><input type="checkbox" disabled> 5. 權限分離檢核：無未授權分錄 (SOD Check)</label></div>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-                <button class="btn btn-primary">執行月結過帳 (Close Period)</button>
+                <div class="form-group"><label><input type="checkbox"> 3. 費用入帳與預付攤銷</label></div>
+                <div class="form-group"><label><input type="checkbox"> 4. 固定資產折舊提列</label></div>
+                <div class="form-group"><label><input type="checkbox" disabled> 5. 權限分離檢核 (SOD) — 自動通過</label></div>
+                <hr style="border: 0; border-top: 1px solid #e2e9f2; margin: 20px 0;">
+                <button class="btn btn-primary" style="width:100%;">🔐 執行月結過帳</button>
             </div>
         </div>
 
+        <!-- 稽核軌跡 -->
         <div id="audit" class="section" style="display:none;">
             <div class="card">
-                <h3>系統稽核日誌 (Immutable Audit Log)</h3>
-                <p style="font-size: 12px; color: #888;">* 紀錄所有系統操作之 Who, When, What，符合法規追溯要求。</p>
+                <h3>🛡️ 系統稽核日誌 (Immutable)</h3>
+                <p style="font-size: 13px; color: #5f7489;">* 符合法規追溯，每筆操作皆記錄 Who, When, What</p>
                 <ul class="audit-list" id="auditLogList"></ul>
             </div>
         </div>
-
     </div>
 </div>
 
 <div class="footer">
-    營養師 李亮頡 研究開發 for 泡泡 2026/04/13
+    🧾 營養師 李亮頡 研究開發 for 泡泡 · 2026/04/13 · 行動優化版
 </div>
 
 <script>
 /**
- * 資料存取與狀態管理 (Simulating Backend Service)
+ * 資料狀態管理 (模擬後端)
  */
 let state = {
     transactions: JSON.parse(localStorage.getItem("erp_txns") || "[]"),
     auditLogs: JSON.parse(localStorage.getItem("erp_logs") || "[]"),
-    currentRows: [] // 暫存當前正在編輯的分錄明細
+    currentRows: [] 
 };
 
-// 產生簡易 UUID
 function generateUUID() {
     return Math.random().toString(36).substring(2, 9).toUpperCase();
 }
 
-// 寫入稽核日誌
+// 寫入稽核日誌 (不可變)
 function logAction(actionDescription) {
     const role = document.getElementById("currentUserRole").value;
     const time = new Date().toLocaleString('zh-TW', { hour12: false });
     const logEntry = { time, role, action: actionDescription };
-    state.auditLogs.unshift(logEntry); // 最新在前
+    state.auditLogs.unshift(logEntry);
     localStorage.setItem("erp_logs", JSON.stringify(state.auditLogs));
     renderAuditLogs();
 }
 
-/**
- * UI 邏輯：導覽與初始化
- */
+// 導覽切換
 function showSection(id, btnElement) {
     document.querySelectorAll(".section").forEach(s => s.style.display = "none");
     document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
@@ -192,24 +555,19 @@ function showSection(id, btnElement) {
 }
 
 window.onload = function() {
-    // 預設填入今日日期
     const today = new Date().toISOString().split('T')[0];
     document.getElementById("txnDate").value = today;
     
-    // 初始化防呆，至少給兩行
+    // 初始化兩筆空白明細
     addEntryRow();
     addEntryRow();
     
     renderLedger();
     renderAuditLogs();
-    
-    // 若無任何日誌，寫入系統啟動
-    if(state.auditLogs.length === 0) logAction("系統初次啟動與初始化");
+    if(state.auditLogs.length === 0) logAction("📱 系統啟動 (行動響應版)");
 }
 
-/**
- * 核心業務邏輯：分錄動態明細與驗證 (V.A.S.T 原則實作)
- */
+// 動態明細管理
 function addEntryRow() {
     const rowId = Date.now() + Math.random();
     state.currentRows.push({ id: rowId, account: '', debit: 0, credit: 0 });
@@ -218,7 +576,7 @@ function addEntryRow() {
 
 function removeEntryRow(id) {
     if (state.currentRows.length <= 2) {
-        alert("基於複式簿記原則，一筆交易至少需要兩行明細。");
+        alert("複式簿記至少需要兩筆明細。");
         return;
     }
     state.currentRows = state.currentRows.filter(r => r.id !== id);
@@ -230,12 +588,10 @@ function updateRowData(id, field, value) {
     const row = state.currentRows.find(r => r.id === id);
     if (row) {
         row[field] = field === 'account' ? value : (parseFloat(value) || 0);
-        
-        // 防呆：借貸不能同時有值
-        if (field === 'debit' && row.debit > 0) { row.credit = 0; }
-        if (field === 'credit' && row.credit > 0) { row.debit = 0; }
-        
-        renderEntryRows(); // 重新渲染以清空互斥欄位
+        // 借貸互斥
+        if (field === 'debit' && row.debit > 0) row.credit = 0;
+        if (field === 'credit' && row.credit > 0) row.debit = 0;
+        renderEntryRows();
         calculateTotals();
     }
 }
@@ -243,21 +599,20 @@ function updateRowData(id, field, value) {
 function renderEntryRows() {
     const container = document.getElementById("entryRowsContainer");
     let html = `
-        <div style="display:flex; gap:10px; margin-bottom:5px; font-weight:bold; font-size:13px; color:#666;">
-            <div style="flex:2;">會計科目 (Account)</div>
-            <div style="flex:1;">借方金額 (Debit)</div>
-            <div style="flex:1;">貸方金額 (Credit)</div>
-            <div style="width: 50px;"></div>
+        <div style="display:flex; gap:10px; margin-bottom:8px; font-weight:600; font-size:13px; color:#4e637b; padding:0 6px;">
+            <div style="flex:2;">會計科目</div>
+            <div style="flex:1;">借方</div>
+            <div style="flex:1;">貸方</div>
+            <div style="width: 58px;"></div>
         </div>
     `;
-
     state.currentRows.forEach(row => {
         html += `
             <div class="entry-row">
-                <input type="text" style="flex:2;" placeholder="例如：銀行存款、進貨成本" value="${row.account}" onchange="updateRowData(${row.id}, 'account', this.value)">
-                <input type="number" style="flex:1;" min="0" value="${row.debit || ''}" placeholder="0" onchange="updateRowData(${row.id}, 'debit', this.value)">
-                <input type="number" style="flex:1;" min="0" value="${row.credit || ''}" placeholder="0" onchange="updateRowData(${row.id}, 'credit', this.value)">
-                <button class="btn btn-danger" style="width:50px;" onclick="removeEntryRow(${row.id})">刪</button>
+                <input type="text" style="flex:2;" placeholder="銀行存款 / 進貨" value="${row.account}" onchange="updateRowData(${row.id}, 'account', this.value)">
+                <input type="number" style="flex:1;" min="0" step="0.01" value="${row.debit || ''}" placeholder="0" onchange="updateRowData(${row.id}, 'debit', this.value)">
+                <input type="number" style="flex:1;" min="0" step="0.01" value="${row.credit || ''}" placeholder="0" onchange="updateRowData(${row.id}, 'credit', this.value)">
+                <button class="btn btn-danger" style="padding:10px 12px;" onclick="removeEntryRow(${row.id})">🗑️</button>
             </div>
         `;
     });
@@ -265,67 +620,40 @@ function renderEntryRows() {
 }
 
 function calculateTotals() {
-    let totalDebit = 0;
-    let totalCredit = 0;
-
-    state.currentRows.forEach(row => {
-        totalDebit += row.debit;
-        totalCredit += row.credit;
-    });
-
+    let totalDebit = 0, totalCredit = 0;
+    state.currentRows.forEach(row => { totalDebit += row.debit; totalCredit += row.credit; });
     document.getElementById("sumDebit").innerText = totalDebit.toLocaleString();
     document.getElementById("sumCredit").innerText = totalCredit.toLocaleString();
-
     const saveBtn = document.getElementById("saveBtn");
     const warning = document.getElementById("balanceWarning");
-
-    // 驗證邏輯 (Validation)：總和必須大於0，且借方等於貸方
     if (totalDebit > 0 && totalDebit === totalCredit) {
         saveBtn.disabled = false;
         warning.style.display = "none";
     } else {
         saveBtn.disabled = true;
-        warning.style.display = "inline";
+        warning.style.display = "inline-block";
     }
 }
 
 function saveTransaction() {
-    // 再度驗證（阻斷不合規的操作）
-    let totalDebit = state.currentRows.reduce((sum, row) => sum + row.debit, 0);
-    let totalCredit = state.currentRows.reduce((sum, row) => sum + row.credit, 0);
-    
+    let totalDebit = state.currentRows.reduce((s, r) => s + r.debit, 0);
+    let totalCredit = state.currentRows.reduce((s, r) => s + r.credit, 0);
     if (totalDebit !== totalCredit || totalDebit === 0) {
-        alert("系統阻斷：借貸不平衡，違反會計恆等式。");
+        alert("❌ 借貸不平衡，無法儲存。");
         return;
     }
-
-    // 過濾掉空科目
     const validEntries = state.currentRows.filter(r => r.account.trim() !== '');
-    if (validEntries.length < 2) {
-        alert("請完整輸入會計科目。");
-        return;
-    }
+    if (validEntries.length < 2) { alert("請填寫至少兩個會計科目"); return; }
 
-    // 建立交易物件 (Structured Data)
     const txn = {
         id: "V-" + generateUUID(),
         date: document.getElementById("txnDate").value,
         creatorRole: document.getElementById("currentUserRole").value,
-        entries: validEntries.map(e => ({
-            account: e.account,
-            debit: e.debit,
-            credit: e.credit
-        }))
+        entries: validEntries.map(e => ({ account: e.account, debit: e.debit, credit: e.credit }))
     };
-
-    // 儲存至 State
     state.transactions.unshift(txn);
     localStorage.setItem("erp_txns", JSON.stringify(state.transactions));
-    
-    // 寫入 Audit Trail (Traceability)
-    logAction(`新增傳票 ${txn.id}，總金額：${totalDebit.toLocaleString()}`);
-
-    // 重置表單
+    logAction(`✅ 新增傳票 ${txn.id} ｜ 總額 ${totalDebit.toLocaleString()}`);
     alert("分錄儲存成功！");
     state.currentRows = [];
     addEntryRow(); addEntryRow();
@@ -333,27 +661,22 @@ function saveTransaction() {
     renderLedger();
 }
 
-/**
- * 報表渲染
- */
 function renderLedger() {
     const tbody = document.getElementById("ledgerTableBody");
-    let html = "";
-    
     if(state.transactions.length === 0) {
         tbody.innerHTML = "<tr><td colspan='6' class='text-center'>尚無交易紀錄</td></tr>";
         return;
     }
-
+    let html = "";
     state.transactions.forEach(txn => {
-        txn.entries.forEach((entry, index) => {
+        txn.entries.forEach((entry, idx) => {
             html += `<tr>
-                ${index === 0 ? `<td rowspan="${txn.entries.length}"><b>${txn.id}</b></td>` : ''}
-                ${index === 0 ? `<td rowspan="${txn.entries.length}">${txn.date}</td>` : ''}
+                ${idx === 0 ? `<td rowspan="${txn.entries.length}"><b>${txn.id}</b></td>` : ''}
+                ${idx === 0 ? `<td rowspan="${txn.entries.length}">${txn.date}</td>` : ''}
                 <td>${entry.account}</td>
-                <td class="text-right">${entry.debit > 0 ? entry.debit.toLocaleString() : ''}</td>
-                <td class="text-right">${entry.credit > 0 ? entry.credit.toLocaleString() : ''}</td>
-                ${index === 0 ? `<td rowspan="${txn.entries.length}" class="text-center">${txn.creatorRole}</td>` : ''}
+                <td class="text-right">${entry.debit>0?entry.debit.toLocaleString():''}</td>
+                <td class="text-right">${entry.credit>0?entry.credit.toLocaleString():''}</td>
+                ${idx === 0 ? `<td class="text-center" rowspan="${txn.entries.length}">${txn.creatorRole}</td>` : ''}
             </tr>`;
         });
     });
