@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>應收沖帳 · 智慧內控助手</title>
+  <title>應收沖帳 · 智慧內控 (UI強化)</title>
   <style>
     /* ----- 全域重置 & 行動優先 ----- */
     * {
@@ -20,7 +20,6 @@
       padding: 0;
       color: #1e2b3a;
     }
-    /* 頂部導航 */
     .app-header {
       background: #1f2d3d;
       color: white;
@@ -42,7 +41,6 @@
       font-size: 1.4rem;
       font-weight: 700;
       margin: 0;
-      letter-spacing: 0.3px;
     }
     .badge {
       background: #1ab394;
@@ -73,7 +71,6 @@
       color: #1f2d3d;
     }
 
-    /* 主內容區域 (flex列，底部導航固定) */
     .main-content {
       flex: 1;
       overflow-y: auto;
@@ -81,7 +78,6 @@
       background: #f4f7fb;
     }
 
-    /* 頁面卡片區塊 */
     .page-section {
       display: block;
     }
@@ -144,7 +140,6 @@
       font-weight: 600;
     }
 
-    /* 決策流程按鈕 */
     .step-badge {
       background: #d4e3fa;
       color: #194a77;
@@ -230,36 +225,111 @@
       font-weight: 700;
     }
 
-    /* 分錄輸入區 */
+    /* ===== 優化：分錄輸入區塊 (響應式對應標籤) ===== */
+    .entry-section {
+      margin-bottom: 18px;
+    }
+    /* 表頭樣式：固定顯示科目/借方/貸方 */
+    .entry-header {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding: 0 6px;
+      font-weight: 700;
+      color: #1e4a6e;
+      font-size: 0.9rem;
+    }
+    .entry-header span {
+      flex: 1;
+    }
+    .entry-header span:first-child {
+      flex: 2;  /* 科目欄位稍寬 */
+    }
+    .entry-header .header-action {
+      width: 52px; /* 與刪除按鈕對齊 */
+    }
+
     .entry-rows {
       background: #fbfdff;
-      border-radius: 20px;
-      padding: 14px;
-      margin-bottom: 16px;
+      border-radius: 24px;
+      padding: 10px 6px;
+      border: 1px solid #d9e6f2;
     }
     .entry-row {
       display: flex;
       gap: 8px;
       margin-bottom: 10px;
-      flex-wrap: wrap;
+      align-items: center;
     }
     .entry-row input {
-      flex: 1;
-      padding: 12px;
-      border: 1.5px solid #d0dae6;
+      padding: 14px 12px;
+      border: 1.8px solid #d0dae6;
       border-radius: 18px;
       font-size: 16px;
+      background: white;
+      flex: 1;
+      min-width: 0;  /* 防止溢出 */
     }
+    /* 科目輸入框稍寬 */
+    .entry-row input:first-child {
+      flex: 2;
+    }
+    .entry-row .delete-btn {
+      width: 52px;
+      padding: 12px 0;
+      background: #fce8e6;
+      border: 1.5px solid #e6b3ae;
+      color: #b13e32;
+      font-weight: 700;
+      border-radius: 40px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    /* 手機極窄時改為垂直堆疊，但仍保留標籤概念 */
+    @media (max-width: 480px) {
+      .entry-header {
+        display: none; /* 隱藏表頭，改為在placeholder體現 */
+      }
+      .entry-row {
+        flex-wrap: wrap;
+        background: #f5f9ff;
+        padding: 12px 10px;
+        border-radius: 24px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      }
+      .entry-row input {
+        width: 100%;
+        flex: auto;
+      }
+      .entry-row input:first-child {
+        flex: auto;
+      }
+      /* 加入偽標籤提示 */
+      .entry-row input[placeholder] {
+        font-size: 15px;
+      }
+      .entry-row .delete-btn {
+        width: 100%;
+        margin-top: 6px;
+        padding: 12px;
+      }
+      /* 在placeholder中加入前綴提示 */
+    }
+
     .summary-box {
       background: #f0f5fa;
-      padding: 16px;
-      border-radius: 20px;
+      padding: 18px 16px;
+      border-radius: 24px;
       display: flex;
       justify-content: space-between;
       font-weight: 700;
+      margin: 16px 0;
+      flex-wrap: wrap;
     }
 
-    /* 表格 */
     .table-wrapper {
       overflow-x: auto;
       border-radius: 18px;
@@ -275,11 +345,8 @@
       padding: 12px 8px;
       border: 1px solid #e2e9f2;
     }
-    th {
-      background: #f4f7fc;
-    }
+    th { background: #f4f7fc; }
 
-    /* 稽核清單 */
     .audit-list {
       list-style: none;
       padding: 0;
@@ -294,7 +361,6 @@
       gap: 6px;
     }
 
-    /* 底部導航 (行動版核心) */
     .bottom-nav {
       background: white;
       display: flex;
@@ -329,21 +395,14 @@
       border-top: 1px dashed #cbdae6;
       margin-top: 10px;
     }
-
-    /* 響應式 */
-    @media (max-width: 480px) {
-      .btn { font-size: 1rem; padding: 14px 4px; }
-      .entry-row { flex-direction: column; }
-    }
   </style>
 </head>
 <body>
 
-<!-- 頂部Header (角色切換) -->
 <header class="app-header">
   <div class="title-section">
     <h1>🧾 應收沖帳·內控</h1>
-    <span class="badge">v3.0 行動版</span>
+    <span class="badge">v3.1 行動強化</span>
   </div>
   <div class="role-selector">
     <label>👤</label>
@@ -355,7 +414,6 @@
   </div>
 </header>
 
-<!-- 主內容區 (動態切換) -->
 <div class="main-content">
   <!-- 沖帳決策頁面 -->
   <div id="page-reconcile" class="page-section">
@@ -364,57 +422,60 @@
         <h3>📌 智慧沖帳決策</h3>
         <span style="background:#e2ebf3; padding:4px 12px; border-radius:40px;">即時引導</span>
       </div>
-      <!-- 模擬收款資訊卡 (融合立帳/沖帳核心) -->
       <div class="info-panel">
         <div class="receipt-summary">
           <span style="font-weight:700;">📥 本次收款</span>
           <span class="amount-highlight" id="receiptAmountDisplay">NT$ 12,500</span>
         </div>
         <div style="margin: 12px 0 6px; font-weight:600;">📄 待沖帳應收發票</div>
-        <div class="invoice-list" id="invoiceListContainer">
-          <!-- 動態由JS渲染，模擬真實立帳資料 -->
-        </div>
+        <div class="invoice-list" id="invoiceListContainer"></div>
         <div style="font-size:0.8rem; color:#4e6e85; margin-top:8px;">
           💡 收款金額 $12,500 · 可合併沖銷前兩筆
         </div>
       </div>
-
-      <!-- 步驟指示器 & 問題區 -->
       <div id="stepBadge" class="step-badge">⚡ 步驟 1 / 5</div>
-      <div class="question-box">
-        <div id="question">🔍 是否能明確辨識付款人？</div>
-      </div>
+      <div class="question-box"><div id="question">🔍 是否能明確辨識付款人？</div></div>
       <div id="buttons" class="action-grid"></div>
       <div id="toolbarArea" class="toolbar"></div>
       <div id="result" class="result-area" style="display: none;"></div>
       <div id="decisionPath" style="margin-top: 12px; font-size:0.85rem; color:#2a6085;"></div>
-      
-      <!-- 快速記錄沖帳分錄按鈕 (完成後顯示) -->
       <div id="postEntryAction" style="margin-top: 16px;"></div>
     </div>
   </div>
 
-  <!-- 立帳/分錄頁面 -->
+  <!-- 立帳/分錄頁面 (重點優化區塊) -->
   <div id="page-journal" class="page-section hidden">
     <div class="card">
       <h3 style="margin-bottom: 12px;">📝 快速立帳 / 分錄</h3>
-      <!-- 快捷模板 -->
       <div style="display: flex; gap: 10px; margin-bottom: 18px;">
         <button class="btn btn-secondary" style="flex:1;" onclick="applyTemplate('sale')">📈 銷售立帳</button>
         <button class="btn btn-secondary" style="flex:1;" onclick="applyTemplate('receipt')">💰 收款分錄</button>
       </div>
       <div class="form-group">
-        <label>📅 交易日期</label>
-        <input type="date" id="txnDate" style="padding:12px; border-radius:24px;">
+        <label style="font-weight:600; display:block; margin-bottom:6px;">📅 交易日期</label>
+        <input type="date" id="txnDate" style="padding:14px; border-radius:30px; border:1.8px solid #d0dae6; width:100%;">
       </div>
-      <div class="entry-rows" id="entryRowsContainer"></div>
-      <button class="btn btn-secondary" onclick="addEntryRow()" style="margin-bottom:12px;">➕ 新增明細</button>
+
+      <!-- 優化：固定標頭 + 輸入區塊 (對應輸入框) -->
+      <div class="entry-section">
+        <div class="entry-header">
+          <span>會計科目</span>
+          <span>借方金額</span>
+          <span>貸方金額</span>
+          <span class="header-action"></span>
+        </div>
+        <div class="entry-rows" id="entryRowsContainer"></div>
+      </div>
+
+      <button class="btn btn-secondary" onclick="addEntryRow()" style="margin:8px 0 16px; width:100%;">➕ 新增明細列</button>
+
       <div class="summary-box">
-        <span>借方總和：<span id="sumDebit">0</span></span>
-        <span>貸方總和：<span id="sumCredit">0</span></span>
-        <span id="balanceWarning" style="color:#d1453b; display:none;">⚠️ 不平衡</span>
+        <span>📊 借方總和：<span id="sumDebit">0</span></span>
+        <span>📊 貸方總和：<span id="sumCredit">0</span></span>
+        <span id="balanceWarning" style="color:#d1453b; display:none;">⚠️ 借貸不平衡</span>
       </div>
       <button id="saveEntryBtn" class="btn btn-primary" style="width:100%;" onclick="saveTransaction()" disabled>✔ 儲存分錄並記錄</button>
+      <p style="font-size:12px; color:#7f8fa0; margin-top:12px; text-align:center;">每一筆分錄均記錄於不可竄改日誌</p>
     </div>
   </div>
 
@@ -455,18 +516,15 @@
 <script>
   (function(){
     "use strict";
-    // ---------- 全域狀態 (整合兩系統) ----------
-    // 沖帳決策狀態
+    // ---------- 全域狀態 ----------
     let step = 0;
     const STEP_MAP = {0:'辨識付款人',1:'金額匹配單張',2:'多張合計',3:'差額判斷',4:'少收',5:'多收'};
     let isFinished = false, finishMessage = '', isUnknown = false;
     
-    // 分錄/交易資料
     let transactions = JSON.parse(localStorage.getItem("erp_txns") || "[]");
     let auditLogs = JSON.parse(localStorage.getItem("erp_logs") || "[]");
     let currentRows = [];
     
-    // 模擬發票資料 (應收立帳)
     let invoices = [
       { code: 'INV-2403-01', amount: 8200, status: '未沖' },
       { code: 'INV-2403-15', amount: 4300, status: '未沖' },
@@ -474,7 +532,6 @@
     ];
     const receiptAmount = 12500;
 
-    // DOM 元素
     const qEl = document.getElementById('question');
     const buttonsEl = document.getElementById('buttons');
     const toolbarEl = document.getElementById('toolbarArea');
@@ -484,7 +541,6 @@
     const postEntryAction = document.getElementById('postEntryAction');
     const receiptAmountDisplay = document.getElementById('receiptAmountDisplay');
     
-    // 分錄相關
     const txnDateInput = document.getElementById('txnDate');
     const sumDebitSpan = document.getElementById('sumDebit');
     const sumCreditSpan = document.getElementById('sumCredit');
@@ -492,11 +548,9 @@
     const saveBtn = document.getElementById('saveEntryBtn');
     const entryContainer = document.getElementById('entryRowsContainer');
     
-    // 初始化日期
     const today = new Date().toISOString().split('T')[0];
     if(txnDateInput) txnDateInput.value = today;
 
-    // ---------- 通用函數: 日誌 ----------
     function logAction(action) {
       const role = document.getElementById('currentUserRole').value;
       const time = new Date().toLocaleString('zh-TW', { hour12: false });
@@ -505,7 +559,6 @@
       renderAuditLogs();
     }
 
-    // ---------- 底部導航切換 ----------
     document.querySelectorAll('.nav-item').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -518,214 +571,126 @@
       });
     });
 
-    // ---------- 沖帳決策渲染 (深度優化) ----------
+    function renderInvoiceList() {
+      document.getElementById('invoiceListContainer').innerHTML = invoices.map(inv => `
+        <div class="invoice-item"><span class="invoice-code">${inv.code}</span><span><strong>$${inv.amount.toLocaleString()}</strong> ${inv.status}</span></div>
+      `).join('');
+    }
+
     function renderReconcile() {
-      // 更新發票顯示
       renderInvoiceList();
       receiptAmountDisplay.innerText = `NT$ ${receiptAmount.toLocaleString()}`;
-      
-      buttonsEl.innerHTML = '';
-      toolbarEl.innerHTML = '';
-      postEntryAction.innerHTML = '';
-      
+      buttonsEl.innerHTML = ''; toolbarEl.innerHTML = ''; postEntryAction.innerHTML = '';
       if (isUnknown) {
         qEl.innerHTML = '⚠️ 無法辨識付款人';
         toolbarEl.innerHTML = `<button class="tool-btn" onclick="resetFlow()">↻ 重新開始</button>`;
-        resultEl.style.display = 'block';
-        resultEl.innerHTML = '→ 建議列入「暫收款」並查明來源';
-        stepBadgeEl.innerHTML = `⚠️ 暫收款`;
-        return;
+        resultEl.style.display = 'block'; resultEl.innerHTML = '→ 建議列入「暫收款」並查明來源';
+        stepBadgeEl.innerHTML = `⚠️ 暫收款`; return;
       }
       if (isFinished) {
         qEl.innerHTML = '✅ 沖帳完成 · 建議已產出';
         toolbarEl.innerHTML = `<button class="tool-btn" onclick="resetFlow()">🔄 處理下一筆</button>`;
-        resultEl.style.display = 'block';
-        resultEl.innerHTML = finishMessage;
+        resultEl.style.display = 'block'; resultEl.innerHTML = finishMessage;
         stepBadgeEl.innerHTML = `✅ 決策結束`;
-        // 增加快速記錄分錄按鈕
-        postEntryAction.innerHTML = `<button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="recordReconcileEntry()">📌 記錄此沖帳分錄 (借銀行存款 / 貸應收帳款)</button>`;
+        postEntryAction.innerHTML = `<button class="btn btn-primary" style="width:100%;" onclick="recordReconcileEntry()">📌 記錄此沖帳分錄</button>`;
         return;
       }
-      
       resultEl.style.display = 'none';
-      let stepText = '', stepNum = 1;
-      if(step===0){stepText='① 付款人辨識';stepNum=1;}
-      else if(step===1){stepText='② 單張發票核對';stepNum=2;}
-      else if(step===2){stepText='③ 多張合計驗證';stepNum=3;}
-      else if(step===3){stepText='④ 差額分析';stepNum=4;}
-      else if(step===4){stepText='⑤ 少收決策';stepNum=5;}
-      else if(step===5){stepText='⑤ 多收決策';stepNum=5;}
+      let stepText='',stepNum=1;
+      if(step===0){stepText='① 付款人辨識';} else if(step===1){stepText='② 單張發票核對';stepNum=2;} else if(step===2){stepText='③ 多張合計驗證';stepNum=3;} else if(step===3){stepText='④ 差額分析';stepNum=4;} else if(step===4){stepText='⑤ 少收決策';stepNum=5;} else if(step===5){stepText='⑤ 多收決策';stepNum=5;}
       stepBadgeEl.innerHTML = `📌 ${stepText} · 步驟 ${stepNum}/5`;
       decisionPathEl.innerHTML = `🔄 當前: ${STEP_MAP[step]}`;
       
-      // 根據step渲染
       if(step===0){
-        qEl.innerHTML = '🔍 是否能明確辨識付款人 (客戶名稱/編號)？';
-        buttonsEl.innerHTML = `<div class="btn-row"><button class="btn btn-primary" onclick="nextStep(1)">✔ 可以</button><button class="btn btn-warning" onclick="markUnknown()">❓ 不行</button></div>`;
+        qEl.innerHTML='🔍 是否能明確辨識付款人？';
+        buttonsEl.innerHTML=`<div class="btn-row"><button class="btn btn-primary" onclick="nextStep(1)">✔ 可以</button><button class="btn btn-warning" onclick="markUnknown()">❓ 不行</button></div>`;
       } else if(step===1){
-        qEl.innerHTML = `💰 收款 $${receiptAmount.toLocaleString()} 是否等於某一張發票？`;
-        buttonsEl.innerHTML = `<div class="btn-row"><button class="btn btn-primary" onclick="finishProcess('✔ 單筆沖帳完成')">✅ 是</button><button class="btn btn-secondary" onclick="nextStep(2)">🔁 否</button></div>`;
+        qEl.innerHTML=`💰 收款 $${receiptAmount.toLocaleString()} 是否等於某一張發票？`;
+        buttonsEl.innerHTML=`<div class="btn-row"><button class="btn btn-primary" onclick="finishProcess('✔ 單筆沖帳完成')">✅ 是</button><button class="btn btn-secondary" onclick="nextStep(2)">🔁 否</button></div>`;
       } else if(step===2){
-        qEl.innerHTML = `🧮 是否為多張發票加總？ (如 INV-01 + INV-15 = $12,500)`;
-        buttonsEl.innerHTML = `<div class="btn-row"><button class="btn btn-primary" onclick="finishProcess('✔ 多筆合併沖帳完成')">📑 是</button><button class="btn btn-secondary" onclick="nextStep(3)">🔀 否</button></div>`;
+        qEl.innerHTML=`🧮 是否為多張發票加總？`;
+        buttonsEl.innerHTML=`<div class="btn-row"><button class="btn btn-primary" onclick="finishProcess('✔ 多筆合併沖帳完成')">📑 是</button><button class="btn btn-secondary" onclick="nextStep(3)">🔀 否</button></div>`;
       } else if(step===3){
-        qEl.innerHTML = '⚖️ 是否有差額？';
-        buttonsEl.innerHTML = `<div class="btn-row"><button class="btn btn-warning" onclick="nextStep(4)">📉 少收</button><button class="btn btn-secondary" onclick="nextStep(5)">📈 多收</button></div>`;
+        qEl.innerHTML='⚖️ 是否有差額？';
+        buttonsEl.innerHTML=`<div class="btn-row"><button class="btn btn-warning" onclick="nextStep(4)">📉 少收</button><button class="btn btn-secondary" onclick="nextStep(5)">📈 多收</button></div>`;
       } else if(step===4){
-        qEl.innerHTML = '📝 少收處理';
-        buttonsEl.innerHTML = `<div class="btn-row"><button class="btn btn-primary" onclick="finishProcess('📌 記錄折讓/未收款')">📎 確認</button></div>`;
+        qEl.innerHTML='📝 少收處理';
+        buttonsEl.innerHTML=`<div class="btn-row"><button class="btn btn-primary" onclick="finishProcess('📌 記錄折讓/未收款')">📎 確認</button></div>`;
       } else if(step===5){
-        qEl.innerHTML = '💵 多收處理';
-        buttonsEl.innerHTML = `<div class="btn-row"><button class="btn btn-primary" onclick="finishProcess('📌 轉列預收款')">📥 確認</button></div>`;
+        qEl.innerHTML='💵 多收處理';
+        buttonsEl.innerHTML=`<div class="btn-row"><button class="btn btn-primary" onclick="finishProcess('📌 轉列預收款')">📥 確認</button></div>`;
       }
-      
-      let toolbarHtml = '';
-      if(step>0 && !isFinished && !isUnknown) toolbarHtml += `<button class="tool-btn" onclick="goBack()">← 上一步</button>`;
-      else toolbarHtml += `<span></span>`;
-      toolbarHtml += `<button class="tool-btn" style="color:#b13e32;" onclick="resetFlow()">⟲ 重置</button>`;
+      let toolbarHtml = (step>0?`<button class="tool-btn" onclick="goBack()">← 上一步</button>`:'<span></span>') + `<button class="tool-btn" style="color:#b13e32;" onclick="resetFlow()">⟲ 重置</button>`;
       toolbarEl.innerHTML = toolbarHtml;
-    }
-
-    function renderInvoiceList() {
-      const container = document.getElementById('invoiceListContainer');
-      container.innerHTML = invoices.map(inv => `
-        <div class="invoice-item">
-          <span class="invoice-code">${inv.code}</span>
-          <span><strong>$${inv.amount.toLocaleString()}</strong> ${inv.status}</span>
-        </div>
-      `).join('');
     }
 
     window.nextStep = (n) => { if(!isFinished&&!isUnknown) { step=n; renderReconcile(); } };
     window.finishProcess = (msg) => { isFinished=true; finishMessage=msg; renderReconcile(); };
     window.markUnknown = () => { isUnknown=true; renderReconcile(); };
-    window.goBack = () => {
-      if(step===1) step=0; else if(step===2) step=1; else if(step===3) step=2; else if(step===4||step===5) step=3;
-      renderReconcile();
-    };
+    window.goBack = () => { if(step===1) step=0; else if(step===2) step=1; else if(step===3) step=2; else if(step===4||step===5) step=3; renderReconcile(); };
     window.resetFlow = () => { step=0; isFinished=false; isUnknown=false; finishMessage=''; renderReconcile(); };
-
-    // 記錄沖帳分錄 (自動產生借銀行存款/貸應收帳款)
     window.recordReconcileEntry = () => {
-      const role = document.getElementById('currentUserRole').value;
-      const txn = {
-        id: 'RCV-' + Math.random().toString(36).substr(2,6).toUpperCase(),
-        date: new Date().toISOString().split('T')[0],
-        creatorRole: role,
-        entries: [
-          { account: '銀行存款', debit: receiptAmount, credit: 0 },
-          { account: '應收帳款', debit: 0, credit: receiptAmount }
-        ]
-      };
-      transactions.unshift(txn);
-      localStorage.setItem("erp_txns", JSON.stringify(transactions));
-      logAction(`📌 沖帳分錄 ${txn.id} ｜ 金額 $${receiptAmount.toLocaleString()}`);
-      alert('沖帳分錄已記錄至總帳');
-      renderLedger();
+      const txn = { id: 'RCV-' + Math.random().toString(36).substr(2,6).toUpperCase(), date: new Date().toISOString().split('T')[0], creatorRole: document.getElementById('currentUserRole').value, entries: [{ account: '銀行存款', debit: receiptAmount, credit: 0 },{ account: '應收帳款', debit: 0, credit: receiptAmount }] };
+      transactions.unshift(txn); localStorage.setItem("erp_txns", JSON.stringify(transactions)); logAction(`📌 沖帳分錄 ${txn.id}`); alert('沖帳分錄已記錄'); renderLedger();
     };
 
-    // ---------- 分錄輸入 (立帳) ----------
+    // 優化：分錄輸入 (對應標籤)
     function renderEntryRows() {
-      let html = `<div style="display:flex; gap:8px; font-weight:600; padding:0 6px;"><span style="flex:2;">科目</span><span style="flex:1;">借方</span><span style="flex:1;">貸方</span><span style="width:50px;"></span></div>`;
+      let html = '';
       currentRows.forEach(row => {
         html += `<div class="entry-row">
-          <input placeholder="科目" value="${row.account}" onchange="updateRow(${row.id},'account',this.value)">
-          <input type="number" step="0.01" value="${row.debit||''}" placeholder="0" onchange="updateRow(${row.id},'debit',this.value)">
-          <input type="number" step="0.01" value="${row.credit||''}" placeholder="0" onchange="updateRow(${row.id},'credit',this.value)">
-          <button class="btn" style="padding:8px;" onclick="removeRow(${row.id})">🗑️</button>
+          <input type="text" placeholder="科目名稱" value="${row.account}" onchange="updateRow(${row.id},'account',this.value)">
+          <input type="number" step="0.01" placeholder="借方金額" value="${row.debit||''}" onchange="updateRow(${row.id},'debit',this.value)">
+          <input type="number" step="0.01" placeholder="貸方金額" value="${row.credit||''}" onchange="updateRow(${row.id},'credit',this.value)">
+          <span class="delete-btn" onclick="removeRow(${row.id})">🗑️</span>
         </div>`;
       });
-      entryContainer.innerHTML = html;
+      entryContainer.innerHTML = html || '<div style="padding:16px; text-align:center;">請點選「新增明細列」</div>';
       calculateTotals();
     }
-    window.addEntryRow = () => {
-      currentRows.push({ id: Date.now()+Math.random(), account:'', debit:0, credit:0 });
-      renderEntryRows();
-    };
-    window.removeRow = (id) => {
-      if(currentRows.length<=2) { alert('至少兩筆分錄'); return; }
-      currentRows = currentRows.filter(r => r.id !== id);
-      renderEntryRows();
-    };
+    window.addEntryRow = () => { currentRows.push({ id: Date.now()+Math.random(), account:'', debit:0, credit:0 }); renderEntryRows(); };
+    window.removeRow = (id) => { if(currentRows.length<=2) { alert('至少兩筆分錄'); return; } currentRows = currentRows.filter(r => r.id !== id); renderEntryRows(); };
     window.updateRow = (id, field, val) => {
       const row = currentRows.find(r => r.id === id);
-      if(row) {
-        row[field] = field==='account'? val : (parseFloat(val)||0);
-        if(field==='debit' && row.debit>0) row.credit=0;
-        if(field==='credit' && row.credit>0) row.debit=0;
-        renderEntryRows();
-      }
+      if(row) { row[field] = field==='account'? val : (parseFloat(val)||0); if(field==='debit' && row.debit>0) row.credit=0; if(field==='credit' && row.credit>0) row.debit=0; renderEntryRows(); }
     };
     function calculateTotals() {
       let deb=0, cred=0; currentRows.forEach(r=>{ deb+=r.debit; cred+=r.credit; });
-      sumDebitSpan.innerText = deb.toLocaleString();
-      sumCreditSpan.innerText = cred.toLocaleString();
-      const balanced = (deb>0 && deb===cred);
-      saveBtn.disabled = !balanced;
-      balanceWarning.style.display = balanced?'none':'inline-block';
+      sumDebitSpan.innerText = deb.toLocaleString(); sumCreditSpan.innerText = cred.toLocaleString();
+      const balanced = (deb>0 && deb===cred); saveBtn.disabled = !balanced; balanceWarning.style.display = balanced?'none':'inline-block';
     }
     window.saveTransaction = () => {
       let deb=0, cred=0; currentRows.forEach(r=>{ deb+=r.debit; cred+=r.credit; });
       if(deb!==cred || deb===0) { alert('借貸不平衡'); return; }
       const valid = currentRows.filter(r=>r.account.trim()!=='');
       if(valid.length<2) { alert('至少兩個科目'); return; }
-      const txn = {
-        id: 'V-' + Math.random().toString(36).substr(2,8).toUpperCase(),
-        date: txnDateInput.value,
-        creatorRole: document.getElementById('currentUserRole').value,
-        entries: valid.map(e=>({ account:e.account, debit:e.debit, credit:e.credit }))
-      };
-      transactions.unshift(txn);
-      localStorage.setItem("erp_txns", JSON.stringify(transactions));
-      logAction(`📝 新增傳票 ${txn.id} ｜ 總額 $${deb.toLocaleString()}`);
-      alert('分錄已儲存');
-      currentRows = []; addEntryRow(); addEntryRow();
-      renderLedger();
+      const txn = { id: 'V-' + Math.random().toString(36).substr(2,8).toUpperCase(), date: txnDateInput.value, creatorRole: document.getElementById('currentUserRole').value, entries: valid.map(e=>({ account:e.account, debit:e.debit, credit:e.credit })) };
+      transactions.unshift(txn); localStorage.setItem("erp_txns", JSON.stringify(transactions)); logAction(`📝 新增傳票 ${txn.id}`); alert('分錄已儲存');
+      currentRows = []; addEntryRow(); addEntryRow(); renderLedger();
     };
     window.applyTemplate = (type) => {
       currentRows = [];
-      if(type==='sale'){
-        currentRows.push({ id:Date.now()+1, account:'應收帳款', debit:12500, credit:0 });
-        currentRows.push({ id:Date.now()+2, account:'銷貨收入', debit:0, credit:12500 });
-      } else {
-        currentRows.push({ id:Date.now()+3, account:'銀行存款', debit:12500, credit:0 });
-        currentRows.push({ id:Date.now()+4, account:'應收帳款', debit:0, credit:12500 });
-      }
+      if(type==='sale'){ currentRows.push({ id:Date.now()+1, account:'應收帳款', debit:12500, credit:0 }); currentRows.push({ id:Date.now()+2, account:'銷貨收入', debit:0, credit:12500 }); }
+      else { currentRows.push({ id:Date.now()+3, account:'銀行存款', debit:12500, credit:0 }); currentRows.push({ id:Date.now()+4, account:'應收帳款', debit:0, credit:12500 }); }
       renderEntryRows();
     };
-
-    // 總帳渲染
     function renderLedger() {
       const tbody = document.getElementById('ledgerTableBody');
       if(!transactions.length){ tbody.innerHTML='<tr><td colspan="6">無紀錄</td></tr>'; return; }
       let html='';
-      transactions.forEach(txn => {
-        txn.entries.forEach((e,idx)=>{
-          html+=`<tr>${idx===0?`<td rowspan="${txn.entries.length}">${txn.id}</td><td rowspan="${txn.entries.length}">${txn.date}</td>`:''}
-            <td>${e.account}</td><td class="text-right">${e.debit?e.debit.toLocaleString():''}</td><td>${e.credit?e.credit.toLocaleString():''}</td>
-            ${idx===0?`<td rowspan="${txn.entries.length}">${txn.creatorRole}</td>`:''}</tr>`;
-        });
-      });
+      transactions.forEach(txn => { txn.entries.forEach((e,idx)=>{ html+=`<tr>${idx===0?`<td rowspan="${txn.entries.length}">${txn.id}</td><td rowspan="${txn.entries.length}">${txn.date}</td>`:''}<td>${e.account}</td><td>${e.debit?e.debit.toLocaleString():''}</td><td>${e.credit?e.credit.toLocaleString():''}</td>${idx===0?`<td rowspan="${txn.entries.length}">${txn.creatorRole}</td>`:''}</tr>`; }); });
       tbody.innerHTML=html;
     }
     function renderAuditLogs() {
-      const list = document.getElementById('auditLogList');
-      list.innerHTML = auditLogs.map(l=>`<li><span style="background:#1f2d3d;color:white;padding:2px 10px;border-radius:20px;">${l.time}</span> <b>${l.role}</b> ${l.action}</li>`).join('');
+      document.getElementById('auditLogList').innerHTML = auditLogs.map(l=>`<li><span style="background:#1f2d3d;color:white;padding:2px 10px;border-radius:20px;">${l.time}</span> <b>${l.role}</b> ${l.action}</li>`).join('');
     }
-
-    // 初始化
     function init() {
-      if(auditLogs.length===0) logAction('📱 系統啟動 (科技園區行動版)');
-      // 初始化分錄兩行
+      if(auditLogs.length===0) logAction('📱 系統啟動');
       currentRows = []; addEntryRow(); addEntryRow();
-      renderReconcile();
-      renderLedger();
-      renderAuditLogs();
+      renderReconcile(); renderLedger(); renderAuditLogs();
     }
     init();
-    // 導出全局
     window.renderLedger = renderLedger;
-    window.renderAuditLogs = renderAuditLogs;
   })();
 </script>
 </body>
